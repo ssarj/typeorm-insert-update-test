@@ -1,21 +1,34 @@
+import { connect } from "net";
 import "reflect-metadata";
-import {createConnection} from "typeorm";
-import {User} from "./entity/User";
+import { createConnection } from "typeorm";
+import { User } from "./entity/User";
 
-createConnection().then(async connection => {
+createConnection()
+  .then(async (connection) => {
+    await connection.createQueryBuilder().delete().from(User).execute();
 
-    console.log("Inserting a new user into the database...");
-    const user = new User();
-    user.firstName = "Timber";
-    user.lastName = "Saw";
-    user.age = 25;
-    await connection.manager.save(user);
-    console.log("Saved a new user with id: " + user.id);
+    const users = [
+      new User({
+        id: "f58ab37b-c3dd-4e05-a0a8-2fcd7d323bc1",
+        name: "f58ab37b-c3dd-4e05-a0a8-2fcd7d323bc1",
+      }),
+      new User({
+        id: "05e1517c-f571-411c-892a-81f01c39a7f3",
+        name: "05e1517c-f571-411c-892a-81f01c39a7f3",
+      }),
+    ];
 
-    console.log("Loading users from the database...");
-    const users = await connection.manager.find(User);
-    console.log("Loaded users: ", users);
+    console.log('(Before insert) Users', users)
+    users.forEach(user => user.assertConsistency())
 
-    console.log("Here you can setup and run express/koa/any other framework.");
+    await connection
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values(users)
+      .execute();
 
-}).catch(error => console.log(error));
+    console.log('(After insert) Users', users)
+    users.forEach(user => user.assertConsistency())
+  })
+  .catch((error) => console.log(error));

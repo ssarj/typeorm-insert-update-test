@@ -1,18 +1,23 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
 
 @Entity()
 export class User {
+  constructor(args: Partial<User> = {}) {
+    Object.assign(this, args);
+  }
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column()
-    firstName: string;
+  @Column()
+  name: string;
 
-    @Column()
-    lastName: string;
+  @CreateDateColumn({ type: 'timestamp', precision: 6 })
+  createdAt: Date
 
-    @Column()
-    age: number;
-
+  assertConsistency() {
+    if (this.id !== this.name) {
+      throw new Error(`Inconsistent state id: ${this.id}, name: ${this.name}`)
+    }
+  }
 }
