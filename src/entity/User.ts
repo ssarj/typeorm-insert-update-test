@@ -16,8 +16,16 @@ export class User {
   createdAt: Date
 
   assertConsistency() {
-    if (this.id !== this.name) {
+    if (!this.consistent) {
       throw new Error(`Inconsistent state id: ${this.id}, name: ${this.name}`)
     }
+  }
+
+  get consistent() {
+    return this.id == this.name
+  }
+
+  toString() {
+    return `id: ${this.id}, name: ${this.name}, (consistent: ${this.consistent})`
   }
 }
